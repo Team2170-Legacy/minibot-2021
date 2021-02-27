@@ -23,6 +23,17 @@ public class MondrianMadnessAutonomous extends SequentialCommandGroup {
     m_drive = drive;
     addRequirements(drive);
     addCommands(        
+      new DriveDistance(fwd_speed, 16, m_drive),
+      new TurnDegreesGyro(-90, m_drive),
+      new DriveDistance(fwd_speed, 16, m_drive),
+      new TurnDegreesGyro(-60, m_drive),
+      new DriveDistance(fwd_speed, 24, m_drive),
+      new TurnDegreesGyro(60, m_drive),
+      new DriveDistance(fwd_speed, 16, m_drive),
+      new TurnDegreesGyro(-90, m_drive),
+      new DriveDistance(fwd_speed, 16, m_drive));
+    /** 
+    addCommands(        
     new DriveDistance(fwd_speed, 16, m_drive),
     new TurnDegrees(-turn_speed, 90, m_drive),
     new DriveDistance(fwd_speed, 16, m_drive),
@@ -32,5 +43,6 @@ public class MondrianMadnessAutonomous extends SequentialCommandGroup {
     new DriveDistance(fwd_speed, 16, m_drive),
     new TurnDegrees(-turn_speed, 90, m_drive),
     new DriveDistance(fwd_speed, 16, m_drive));
+    */
   }
 }
