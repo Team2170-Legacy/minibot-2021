@@ -36,7 +36,6 @@ public class Drivetrain extends SubsystemBase {
 
   // Set up the BuiltInAccelerometer
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
-  private final DifferentialDriveOdometry m_odometry;
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -44,7 +43,6 @@ public class Drivetrain extends SubsystemBase {
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
-    m_odometry = new DifferentialDriveOdometry(getRotation2d());
   }
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
@@ -104,10 +102,6 @@ public class Drivetrain extends SubsystemBase {
     return m_accelerometer.getZ();
   }
 
-  public Rotation2d getRotation2d() {
-    return new Rotation2d(Math.toRadians(m_gyro.getAngleX()));
-  }
-
   /**
    * Current angle of the Romi around the X-axis.
    *
@@ -143,7 +137,5 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_odometry.update(getRotation2d(), m_leftEncoder.getDistance(),
-                      m_rightEncoder.getDistance());
   }
 }
