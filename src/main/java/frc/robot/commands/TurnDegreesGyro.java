@@ -12,8 +12,11 @@ public class TurnDegreesGyro extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_degrees;
   private double m_target_degrees;
-  private final double kP = 1.0/180.0;
-  private final double acceptable_error = 5;
+  private final double kP = 0.003;
+  private final double kI = 0.002;
+  private double integrator = 0;
+  private final double delta_time = 0.02;
+  private final double acceptable_error = 10;
 
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
@@ -42,7 +45,8 @@ public class TurnDegreesGyro extends CommandBase {
   @Override
   public void execute() {
     double error = m_target_degrees - m_drive.getGyroAngleZ();
-    m_drive.arcadeDrive(0, kP * error);
+    integrator += error * delta_time;
+    m_drive.arcadeDrive(0, kP * error + kI * integrator);
   }
 
   // Called once the command ends or is interrupted.
