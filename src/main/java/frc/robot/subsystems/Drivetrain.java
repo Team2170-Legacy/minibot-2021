@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc.robot.sensors.RomiGyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,16 +38,32 @@ public class Drivetrain extends SubsystemBase {
   // Set up the BuiltInAccelerometer
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
+  // Odometry class for tracking robot pose
+  private final DifferentialDriveOdometry m_odometry;
+
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     // Use inches as unit for encoder distances
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
+    m_odometry = new DifferentialDriveOdometry(getGyroRotation2d());
   }
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+  }
+
+  /**
+   * Controls the left and right sides of the drive directly with voltages.
+   *
+   * @param leftVolts  the commanded left output
+   * @param rightVolts the commanded right output
+   */
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    m_leftMotor.setVoltage(leftVolts);
+    m_rightMotor.setVoltage(-rightVolts);
+    m_diffDrive.feed();
   }
 
   public void resetEncoders() {
@@ -74,6 +91,8 @@ public class Drivetrain extends SubsystemBase {
     return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
   }
 
+  
+
 
   /**
    * The acceleration in the X-axis.
@@ -100,6 +119,16 @@ public class Drivetrain extends SubsystemBase {
    */
   public double getAccelZ() {
     return m_accelerometer.getZ();
+  }
+
+
+    /**
+   * Current angle of the Romi as a Rotation2d object.
+   *
+   * @return The current angle of the Romi as a Rotation2d Object
+   */
+  public Rotation2d getGyroRotation2d() {
+    return new Rotation2d(Math.toRadians(m_gyro.getAngleZ()));
   }
 
   /**
@@ -134,8 +163,42 @@ public class Drivetrain extends SubsystemBase {
     m_gyro.reset();
   }
 
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    //TODO: Check units 
+    return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
+  }
+  
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, getGyroRotation2d());
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // Update the odometry in the periodic block
+    m_odometry.update(getGyroRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
+
+  
+
 }

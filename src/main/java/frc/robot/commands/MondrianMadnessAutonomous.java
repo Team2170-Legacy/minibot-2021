@@ -13,6 +13,7 @@ import frc.robot.subsystems.Drivetrain;
 public class MondrianMadnessAutonomous extends SequentialCommandGroup {
   private final Drivetrain m_drive;
   private final double fwd_speed = 1;
+  private final double turn_speed = 1;
   
   
   /** Creates a new MondrianMadnessAutonomous. */
@@ -21,20 +22,18 @@ public class MondrianMadnessAutonomous extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     m_drive = drive;
     addRequirements(drive);
-    //addCommands( 
-    //  new TurnDegreesGyro(-90, m_drive));
-
     addCommands(        
       new DriveDistance(fwd_speed, 16, m_drive),
       new TurnDegreesGyro(-90, m_drive),
       new DriveDistance(fwd_speed, 16, m_drive),
-      new TurnDegreesGyro(-120, m_drive),
+      new TurnDegreesGyro(-60, m_drive),
       new DriveDistance(fwd_speed, 24, m_drive),
-      new TurnDegreesGyro(90, m_drive),
+      new TurnDegreesGyro(60, m_drive),
       new DriveDistance(fwd_speed, 16, m_drive),
-      new TurnDegreesGyro(90, m_drive),
+      new TurnDegreesGyro(-90, m_drive),
       new DriveDistance(fwd_speed, 16, m_drive));
 
+      
     /** 
     addCommands(        
     new DriveDistance(fwd_speed, 16, m_drive),

@@ -4,20 +4,31 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
 import frc.robot.commands.MondrianMadnessAutonomous;
+import frc.robot.commands.ColorChallenge;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.OnBoardIO;
 import frc.robot.subsystems.OnBoardIO.ChannelMode;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
 /**
@@ -76,6 +87,8 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     m_chooser.addOption("Mondrian Madness", new MondrianMadnessAutonomous(m_drivetrain));
+    m_chooser.addOption("Color Challenge Old", new ColorChallenge(m_drivetrain));
+    m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
     SmartDashboard.putData(m_chooser);
   }
 
@@ -87,6 +100,42 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return m_chooser.getSelected();
 
+  }
+  
+  
+  public Command getTrajectoryCommandFromJSON(String trajectoryJSON) {
+  
+    Trajectory trajectory = new Trajectory();
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+      System.out.println("[*] Could Not Find Trajectory JSON");
+    }
+        
+    
+
+    RamseteCommand ramseteCommand = new RamseteCommand(
+        trajectory,
+        m_drivetrain::getPose,
+        new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
+        new SimpleMotorFeedforward(Constants.ksVolts,
+                                   Constants.kvVoltSecondsPerMeter,
+                                   Constants.kaVoltSecondsSquaredPerMeter),
+        Constants.kDriveKinematics,
+        m_drivetrain::getWheelSpeeds,
+        new PIDController(Constants.kPDriveVel, 0, 0),
+        new PIDController(Constants.kPDriveVel, 0, 0),
+        // RamseteCommand passes volts to the callback
+        m_drivetrain::tankDriveVolts,
+        m_drivetrain
+    );
+
+    // Reset odometry to the starting pose of the trajectory.
+    m_drivetrain.resetOdometry(trajectory.getInitialPose());
+
+    // Run path following command, then stop at the end.
+    return ramseteCommand.andThen(() -> m_drivetrain.tankDriveVolts(0, 0));
   }
 
   /**
