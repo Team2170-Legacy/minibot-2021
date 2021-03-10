@@ -23,24 +23,23 @@ public final class Constants {
         TODO: Tune these values, these are only examples
 
         Constansts Copied From Here: https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/trajectory-tutorial/entering-constants.html
-    */
-    public static final double ksVolts = 0.22;
-    public static final double kvVoltSecondsPerMeter = 1.98;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+
+        Commented values are original values
+        */
+    public static final double ksVolts = 0; //0.22;
+    public static final double kvVoltSecondsPerInch = 1.98; //1.98
+    public static final double kaVoltSecondsSquaredPerInch = 0.2;//0.2
 
     
-    public static final double kPDriveVel = 8.5;
+    public static final double kPDriveVel = 8.5;//8.5
 
     // Differential Drive Kinematics
-    public static final double kTrackwidthMeters = 0.69;
-    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
-
-    // Max Trajectory Velocity/Acceleration
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kTrackWidthInches = 5.5; 
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackWidthInches);
 
     // Ramsete Parameters
-    public static final double kRamseteB = 2;
-    public static final double kRamseteZeta = 0.7;
+    public static final double kRamseteB = 2; //2
+    public static final double kRamseteZeta = 0.75; //0.75
 
+    public static final double MetersToInches = 39.3701;
 }

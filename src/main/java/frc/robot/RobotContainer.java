@@ -89,6 +89,7 @@ public class RobotContainer {
     m_chooser.addOption("Mondrian Madness", new MondrianMadnessAutonomous(m_drivetrain));
     m_chooser.addOption("Color Challenge Old", new ColorChallenge(m_drivetrain));
     m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
+    m_chooser.addOption("Straight 1 yard", getTrajectoryCommandFromJSON("paths/output/1ydstraight.wpilib.json"));
     SmartDashboard.putData(m_chooser);
   }
 
@@ -120,8 +121,8 @@ public class RobotContainer {
         m_drivetrain::getPose,
         new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
         new SimpleMotorFeedforward(Constants.ksVolts,
-                                   Constants.kvVoltSecondsPerMeter,
-                                   Constants.kaVoltSecondsSquaredPerMeter),
+                                   Constants.kvVoltSecondsPerInch,
+                                   Constants.kaVoltSecondsSquaredPerInch),
         Constants.kDriveKinematics,
         m_drivetrain::getWheelSpeeds,
         new PIDController(Constants.kPDriveVel, 0, 0),
