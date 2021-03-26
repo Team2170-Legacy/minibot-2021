@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import frc.robot.Constants;
 import frc.robot.sensors.RomiGyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.util.Units;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
@@ -45,8 +45,8 @@ public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     // Use inches as unit for encoder distances
-    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
-    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    m_leftEncoder.setDistancePerPulse((Math.PI * Units.inchesToMeters(kWheelDiameterInch)) / kCountsPerRevolution);
+    m_rightEncoder.setDistancePerPulse((Math.PI * Units.inchesToMeters(kWheelDiameterInch)) / kCountsPerRevolution);
     resetEncoders();
     m_odometry = new DifferentialDriveOdometry(getGyroRotation2d());
   }
@@ -170,18 +170,10 @@ public class Drivetrain extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+    //TODO: Check units 
     return m_odometry.getPoseMeters();
   }
 
-  /*
-  public Pose2d getPoseInches() {
-    Pose2d poseMeters = m_odometry.getPoseMeters();
-    double Pose2dX = poseMeters.getX() * Constants.MetersToInches; 
-    double Pose2dY = poseMeters.getY() * Constants.MetersToInches;
-    Pose2d poseInches = new Pose2d(Pose2dX, Pose2dY, poseMeters.getRotation()); 
-    return poseInches;
-  }
-*/
   /**
    * Returns the current wheel speeds of the robot.
    *

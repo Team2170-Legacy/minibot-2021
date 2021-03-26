@@ -24,22 +24,29 @@ public final class Constants {
 
         Constansts Copied From Here: https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/trajectory-tutorial/entering-constants.html
 
-        Commented values are original values
-        */
-    public static final double ksVolts = 0; //0.22;
-    public static final double kvVoltSecondsPerInch = 1.98; //1.98
-    public static final double kaVoltSecondsSquaredPerInch = 0.2;//0.2
+        Execute: C:\Users\GEH-Magnet School 1\Desktop\frc-characterization-main\frc-characterization-main\frc_characterization\cli
+
+        
+    */
 
     
-    public static final double kPDriveVel = 8.5;//8.5
+    public static final double ksVolts = 1.99; //0.22
+    public static final double kvVoltSecondsPerMeter = 5.04;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.0563;
+
+    
+    public static final double kPDriveVel = 11.7;
 
     // Differential Drive Kinematics
-    public static final double kTrackWidthInches = 5.5; 
-    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackWidthInches);
+    public static final double kTrackwidthMeters = 0.142072613;
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
+
+    // Max Trajectory Velocity/Acceleration
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
     // Ramsete Parameters
-    public static final double kRamseteB = 2; //2
-    public static final double kRamseteZeta = 0.75; //0.75
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
 
-    public static final double MetersToInches = 39.3701;
 }

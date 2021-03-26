@@ -13,8 +13,7 @@ import frc.robot.subsystems.Drivetrain;
 public class MondrianMadnessAutonomous extends SequentialCommandGroup {
   private final Drivetrain m_drive;
   private final double fwd_speed = 1;
-  private final double turn_speed = 1;
-  
+ 
   
   /** Creates a new MondrianMadnessAutonomous. */
   public MondrianMadnessAutonomous(Drivetrain drive) {

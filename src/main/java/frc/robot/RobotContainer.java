@@ -88,8 +88,11 @@ public class RobotContainer {
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     m_chooser.addOption("Mondrian Madness", new MondrianMadnessAutonomous(m_drivetrain));
     m_chooser.addOption("Color Challenge Old", new ColorChallenge(m_drivetrain));
-    m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
-    m_chooser.addOption("Straight 1 yard", getTrajectoryCommandFromJSON("paths/output/1ydstraight.wpilib.json"));
+    m_chooser.addOption("Slaolm Path", getTrajectoryCommandFromJSON("paths/output/Salolm.wpilib.json"));
+    m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
+    //m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
+    //m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
+    
     SmartDashboard.putData(m_chooser);
   }
 
@@ -102,7 +105,7 @@ public class RobotContainer {
     return m_chooser.getSelected();
 
   }
-  
+
   
   public Command getTrajectoryCommandFromJSON(String trajectoryJSON) {
   
@@ -121,8 +124,8 @@ public class RobotContainer {
         m_drivetrain::getPose,
         new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
         new SimpleMotorFeedforward(Constants.ksVolts,
-                                   Constants.kvVoltSecondsPerInch,
-                                   Constants.kaVoltSecondsSquaredPerInch),
+                                   Constants.kvVoltSecondsPerMeter,
+                                   Constants.kaVoltSecondsSquaredPerMeter),
         Constants.kDriveKinematics,
         m_drivetrain::getWheelSpeeds,
         new PIDController(Constants.kPDriveVel, 0, 0),
