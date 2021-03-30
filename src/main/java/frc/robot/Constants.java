@@ -30,23 +30,31 @@ public final class Constants {
     */
 
     
-    public static final double ksVolts = 1.99; //0.22
-    public static final double kvVoltSecondsPerMeter = 5.04;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.0563;
+    public static final double ksVolts = 0.929;
+    public static final double kvVoltSecondsPerMeter = 6.33;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.0389;
 
-    
-    public static final double kPDriveVel = 11.7;
+    public static final double kPDriveVel = 0.085;
 
-    // Differential Drive Kinematics
     public static final double kTrackwidthMeters = 0.142072613;
     public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
 
     // Max Trajectory Velocity/Acceleration
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 0.8;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.8;
 
-    // Ramsete Parameters
+    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
 
+
+    // This is the max Speed for the teleoperated Robot
+
+    /*  
+        The PERFECT ratio is 4 : 3 = SpeedInput : RotationInput
+    */
+    public static final double maxSpeedInput = 1; // 1
+
+    // This is the max Rotation for the teleoperated Robot
+    public static final double maxRotationalInput = 0.87; //0.87
 }

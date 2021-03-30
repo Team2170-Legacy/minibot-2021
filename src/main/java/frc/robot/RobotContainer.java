@@ -90,6 +90,7 @@ public class RobotContainer {
     m_chooser.addOption("Color Challenge Old", new ColorChallenge(m_drivetrain));
     m_chooser.addOption("Slaolm Path", getTrajectoryCommandFromJSON("paths/output/Salolm.wpilib.json"));
     m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
+    m_chooser.addOption("Curve", getTrajectoryCommandFromJSON("paths/output/curve.wpilib.json"));
     //m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
     //m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
     
@@ -131,7 +132,7 @@ public class RobotContainer {
         new PIDController(Constants.kPDriveVel, 0, 0),
         new PIDController(Constants.kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback
-        m_drivetrain::tankDriveVolts,
+        m_drivetrain::hookVoltage,
         m_drivetrain
     );
 
@@ -139,7 +140,7 @@ public class RobotContainer {
     m_drivetrain.resetOdometry(trajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> m_drivetrain.tankDriveVolts(0, 0));
+    return ramseteCommand.andThen(() -> m_drivetrain.hookVoltage(0, 0));
   }
 
   /**
@@ -152,4 +153,6 @@ public class RobotContainer {
        m_drivetrain, () -> m_adapter.getForwardSpeed(), () -> m_adapter.getRotationalSpeed());
        // m_drivetrain, () -> m_controller.getRawAxis(1), () -> m_controller.getRawAxis(2));
   }
+
+  
 }

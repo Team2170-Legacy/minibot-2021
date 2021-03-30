@@ -25,7 +25,16 @@ public class JoystickAdapter {
                 forwardSpeed = forwardSpeed * -1;
             }
         }
-      
+        
+        // Rate Limiting
+        if (forwardSpeed > Constants.maxSpeedInput){
+            forwardSpeed = Constants.maxSpeedInput;
+        } else if (forwardSpeed < -Constants.maxSpeedInput){
+            forwardSpeed = -Constants.maxSpeedInput;
+        }
+
+
+        
         return forwardSpeed;
     }
  
@@ -41,6 +50,14 @@ public class JoystickAdapter {
                 rotationalSpeed = rotationalSpeed * -1;
             }
         }
+
+        // Rate Limiting
+        if (rotationalSpeed > Constants.maxRotationalInput){
+            rotationalSpeed = Constants.maxRotationalInput;
+        } else if (rotationalSpeed < -Constants.maxRotationalInput){
+            rotationalSpeed = -Constants.maxRotationalInput;
+        }
+
         return rotationalSpeed;
     }
     

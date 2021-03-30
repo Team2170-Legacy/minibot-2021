@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+
+
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
@@ -41,6 +43,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
+  
+  private double hookedLeftVolts;
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -65,6 +69,12 @@ public class Drivetrain extends SubsystemBase {
     m_leftMotor.setVoltage(leftVolts);
     m_rightMotor.setVoltage(-rightVolts);
     m_diffDrive.feed();
+  }
+
+  public void hookVoltage(double leftVolts, double rightVolts) {
+    
+    hookedLeftVolts = leftVolts * 0.01;
+    tankDriveVolts(hookedLeftVolts, rightVolts);
   }
 
   public void resetEncoders() {
