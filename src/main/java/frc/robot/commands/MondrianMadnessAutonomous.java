@@ -33,7 +33,7 @@ public class MondrianMadnessAutonomous extends SequentialCommandGroup {
       new DriveDistance(fwd_speed, 16, m_drive));
 
       
-    /** 
+    /* 
     addCommands(        
     new DriveDistance(fwd_speed, 16, m_drive),
     new TurnDegrees(-turn_speed, 90, m_drive),

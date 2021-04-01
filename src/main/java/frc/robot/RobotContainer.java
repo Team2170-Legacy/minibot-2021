@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -14,6 +15,9 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
@@ -25,8 +29,12 @@ import frc.robot.subsystems.OnBoardIO.ChannelMode;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
@@ -88,9 +96,11 @@ public class RobotContainer {
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     m_chooser.addOption("Mondrian Madness", new MondrianMadnessAutonomous(m_drivetrain));
     m_chooser.addOption("Color Challenge Old", new ColorChallenge(m_drivetrain));
-    m_chooser.addOption("Slaolm Path", getTrajectoryCommandFromJSON("paths/output/Salolm.wpilib.json"));
-    m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
-    m_chooser.addOption("Curve", getTrajectoryCommandFromJSON("paths/output/curve.wpilib.json"));
+    //m_chooser.addOption("Slaolm Path", getTrajectoryCommandFromJSON("paths/output/Salolm.wpilib.json"));
+    //m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
+    //m_chooser.addOption("Curve", getTrajectoryCommandFromJSON("paths/output/curve.wpilib.json"));
+    m_chooser.addOption("Curve", getTrajectoryCommandFromJSON());
+
     //m_chooser.addOption("Color Challenge New", getTrajectoryCommandFromJSON("paths/output/first.wpilib.json"));
     //m_chooser.addOption("Straight 1 Yard", getTrajectoryCommandFromJSON("paths/output/straight.wpilib.json"));
     
@@ -108,40 +118,62 @@ public class RobotContainer {
   }
 
   
-  public Command getTrajectoryCommandFromJSON(String trajectoryJSON) {
-  
-    Trajectory trajectory = new Trajectory();
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    } catch (IOException ex) {
-      System.out.println("[*] Could Not Find Trajectory JSON");
-    }
-        
-    
+  private Command getTrajectoryCommandFromJSON() {
+    var autoVoltageConstraint =
+        new DifferentialDriveVoltageConstraint(
+            new SimpleMotorFeedforward(Constants.ksVolts, 
+                                       Constants.kvVoltSecondsPerMeter, 
+                                       Constants.kaVoltSecondsSquaredPerMeter),
+            Constants.kDriveKinematics,
+            10);
+
+    TrajectoryConfig config =
+        new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond, 
+                             Constants.kMaxAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.kDriveKinematics)
+            .addConstraint(autoVoltageConstraint);
+
+    // This trajectory can be modified to suit your purposes
+    // Note that all coordinates are in meters, and follow NWU conventions.
+    // If you would like to specify coordinates in inches (which might be easier
+    // to deal with for the Romi), you can use the Units.inchesToMeters() method
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        List.of(
+          new Translation2d(0.6, 0.23),
+          new Translation2d(1.35, 0.13),
+          new Translation2d(1.55, -0.4),
+          new Translation2d(1.68, 0.47),
+          new Translation2d(1.23, 0.15),
+          new Translation2d(1.01, 0)
+        ),
+        new Pose2d(0, 0.94, new Rotation2d(Math.PI)),
+        config);
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        trajectory,
+        exampleTrajectory,
         m_drivetrain::getPose,
         new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
-        new SimpleMotorFeedforward(Constants.ksVolts,
-                                   Constants.kvVoltSecondsPerMeter,
-                                   Constants.kaVoltSecondsSquaredPerMeter),
+        new SimpleMotorFeedforward(Constants.ksVolts, Constants.kvVoltSecondsPerMeter, Constants.kaVoltSecondsSquaredPerMeter),
         Constants.kDriveKinematics,
         m_drivetrain::getWheelSpeeds,
         new PIDController(Constants.kPDriveVel, 0, 0),
         new PIDController(Constants.kPDriveVel, 0, 0),
-        // RamseteCommand passes volts to the callback
-        m_drivetrain::hookVoltage,
-        m_drivetrain
-    );
+        m_drivetrain::tankDriveVolts,
+        m_drivetrain);
 
-    // Reset odometry to the starting pose of the trajectory.
-    m_drivetrain.resetOdometry(trajectory.getInitialPose());
+    m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose());
 
-    // Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> m_drivetrain.hookVoltage(0, 0));
-  }
+    // Set up a sequence of commands
+    // First, we want to reset the drivetrain odometry
+    return new InstantCommand(() -> m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose()), m_drivetrain)
+        // next, we run the actual ramsete command
+        .andThen(ramseteCommand)
+
+        // Finally, we make sure that the robot stops
+        .andThen(new InstantCommand(() -> m_drivetrain.tankDriveVolts(0, 0), m_drivetrain));
+  } 
 
   /**
    * Use this to pass the teleop command to the main {@link Robot} class.
